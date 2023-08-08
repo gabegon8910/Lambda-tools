@@ -42,13 +42,14 @@ To submit a new Lambda tool to this repository:
 
 Each Lambda tool should follow a consistent directory structure to ensure easy discovery and understanding:
 
+```
 tools/
 └── your-tool-name/
-├── README.md # Description and usage instructions.
-├── tool-code/ # Source code and resources for the tool.
-├── screenshots/ # Screenshots or diagrams (optional).
-└── CONTRIBUTING.md # Optional, if additional contribution guidelines are needed.
-
+    ├── README.md         # Description and usage instructions.
+    ├── tool-code/        # Source code and resources for the tool.
+    ├── screenshots/      # Screenshots or diagrams (optional).
+    └── CONTRIBUTING.md   # Optional, if additional contribution guidelines are needed.
+```
 ## License
 
 This repository is licensed under the [MIT License](LICENSE). By contributing to this repository, you agree to license your contributions under the same terms.
