@@ -20,8 +20,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 200,
             'body': {
-                'message': f'Instances using security group {security_group_id}',
-                'instances': instances
+            'message': f'Instances using security group {security_group_id}'
             }
         }
     else:

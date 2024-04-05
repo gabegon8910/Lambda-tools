@@ -12,38 +12,7 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
-    """Secrets Manager RDS Oracle Handler
-
-    This handler uses the single-user rotation scheme to rotate an RDS Oracle user credential. This rotation scheme
-    logs into the database as the user and rotates the user's own password, immediately invalidating the user's
-    previous password.
-
-    The Secret SecretString is expected to be a JSON string with the following format:
-    {
-        'engine': <required: must be set to 'oracle'>,
-        'host': <required: instance host name>,
-        'username': <required: username>,
-        'password': <required: password>,
-        'dbname': <required: database name>,
-        'port': <optional: if not specified, default port 1521 will be used>
-    }
-
-    Args:
-        event (dict): Lambda dictionary of event parameters. These keys must include the following:
-            - SecretId: The secret ARN or identifier
-            - ClientRequestToken: The ClientRequestToken of the secret version
-            - Step: The rotation step (one of createSecret, setSecret, testSecret, or finishSecret)
-
-        context (LambdaContext): The Lambda runtime information
-
-    Raises:
-        ResourceNotFoundException: If the secret with the specified arn and stage does not exist
-
-        ValueError: If the secret is not properly configured for rotation
-
-        KeyError: If the secret json does not contain the expected keys
-
-    """
+    
     arn = event['SecretId']
     token = event['ClientRequestToken']
     step = event['Step']
@@ -86,24 +55,7 @@ def lambda_handler(event, context):
 
 
 def create_secret(service_client, arn, token):
-    """Generate a new secret
-
-    This method first checks for the existence of a secret for the passed in token. If one does not exist, it will generate a
-    new secret and put it with the passed in token.
-
-    Args:
-        service_client (client): The secrets manager service client
-
-        arn (string): The secret ARN or other identifier
-
-        token (string): The ClientRequestToken associated with the secret version
-
-    Raises:
-        ValueError: If the current secret is not valid JSON
-
-        KeyError: If the secret json does not contain the expected keys
-
-    """
+    
     # Make sure the current secret exists
     current_dict = get_secret_dict(service_client, arn, "AWSCURRENT")
 
@@ -205,26 +157,7 @@ def set_secret(service_client, arn, token):
 
 
 def test_secret(service_client, arn, token):
-    """Test the pending secret against the database
-
-    This method tries to log into the database with the secrets staged with AWSPENDING and runs
-    a permissions check to ensure the user has the corrrect permissions.
-
-    Args:
-        service_client (client): The secrets manager service client
-
-        arn (string): The secret ARN or other identifier
-
-        token (string): The ClientRequestToken associated with the secret version
-
-    Raises:
-        ResourceNotFoundException: If the secret with the specified arn and stage does not exist
-
-        ValueError: If the secret is not valid JSON or valid credentials are found to login to the database
-
-        KeyError: If the secret json does not contain the expected keys
-
-    """
+    
     # Try to login with the pending secret, if it succeeds, return
     conn = get_connection(get_secret_dict(service_client, arn, "AWSPENDING", token))
     if conn:
@@ -242,18 +175,7 @@ def test_secret(service_client, arn, token):
 
 
 def finish_secret(service_client, arn, token):
-    """Finish the rotation by marking the pending secret as current
-
-    This method finishes the secret rotation by staging the secret staged AWSPENDING with the AWSCURRENT stage.
-
-    Args:
-        service_client (client): The secrets manager service client
-
-        arn (string): The secret ARN or other identifier
-
-        token (string): The ClientRequestToken associated with the secret version
-
-    """
+    
     # First describe the secret to get the current version
     metadata = service_client.describe_secret(SecretId=arn)
     current_version = None
